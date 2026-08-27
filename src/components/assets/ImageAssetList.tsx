@@ -1,5 +1,12 @@
 import React from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
@@ -9,20 +16,36 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface ImageAssetListProps {
   assets: ImageAsset[];
+  onDelete?: (id: string) => void;
 }
 
-export default function ImageAssetList({assets}: ImageAssetListProps) {
+export default function ImageAssetList({assets, onDelete}: ImageAssetListProps) {
   const {colors} = useTheme();
 
   if (assets.length === 0) {
     return (
       <EmptyState
         icon="image"
-        title="No Image Assets"
-        message="Image prompts will appear here after extraction"
+        title="No Image Prompts Found"
+        message="Extract prompts from chat in the Preview page using <Image>your prompt</Image> tags."
       />
     );
   }
+
+  const handleDelete = (item: ImageAsset, index: number) => {
+    Alert.alert(
+      'Delete Prompt',
+      `Are you sure you want to delete Image Prompt #${index + 1}?`,
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => onDelete && onDelete(item.id),
+        },
+      ],
+    );
+  };
 
   return (
     <FlatList
@@ -38,36 +61,34 @@ export default function ImageAssetList({assets}: ImageAssetListProps) {
               borderColor: colors.border,
             },
           ]}>
-          <View
-            style={[
-              styles.thumbnail,
-              {backgroundColor: colors.background},
-            ]}>
-            <Icon name="image" size={24} color={colors.textLight} />
+          <View style={styles.cardHeader}>
+            <View style={styles.badgeRow}>
+              <View
+                style={[
+                  styles.badge,
+                  {backgroundColor: colors.primary + '15'},
+                ]}>
+                <Icon name="photo-camera" size={14} color={colors.primary} />
+                <Text style={[styles.badgeText, {color: colors.primary}]}>
+                  Image Prompt #{index + 1}
+                </Text>
+              </View>
+            </View>
+
+            {onDelete && (
+              <TouchableOpacity
+                onPress={() => handleDelete(item, index)}
+                hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
+                <Icon name="delete-outline" size={18} color={colors.danger} />
+              </TouchableOpacity>
+            )}
           </View>
-          <View style={styles.info}>
-            <Text style={[styles.promptNumber, {color: colors.text}]}>
-              Prompt {index + 1}
-            </Text>
-            <Text
-              style={[styles.prompt, {color: colors.textSecondary}]}
-              numberOfLines={2}>
-              {item.prompt}
-            </Text>
-            <View
-              style={[
-                styles.statusDot,
-                {
-                  backgroundColor:
-                    item.status === 'done'
-                      ? colors.secondary
-                      : item.status === 'generating'
-                      ? colors.warning
-                      : colors.textLight,
-                },
-              ]}
-            />
-          </View>
+
+          <Text
+            style={[styles.promptText, {color: colors.text}]}
+            selectable={true}>
+            {item.prompt}
+          </Text>
         </View>
       )}
     />
@@ -77,38 +98,44 @@ export default function ImageAssetList({assets}: ImageAssetListProps) {
 const styles = StyleSheet.create({
   list: {
     padding: Spacing.lg,
+    paddingBottom: 100,
   },
   card: {
-    flexDirection: 'row',
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.lg,
     padding: Spacing.md,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
     borderWidth: 1,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.sm,
+  },
+  badgeRow: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  thumbnail: {
-    width: 56,
-    height: 56,
-    borderRadius: BorderRadius.sm,
+  badge: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: Spacing.md,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    gap: 4,
   },
-  info: {
-    flex: 1,
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
   },
-  promptNumber: {
-    ...Typography.captionBold,
-    marginBottom: Spacing.xs,
-  },
-  prompt: {
-    ...Typography.caption,
-    lineHeight: 18,
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginTop: Spacing.xs,
+  promptText: {
+    ...Typography.body,
+    fontSize: 13,
+    lineHeight: 20,
   },
 });

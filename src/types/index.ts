@@ -24,20 +24,24 @@ export interface ChatMessage {
 export interface ImageAsset {
   id: string;
   profileId: string;
-  scriptId: string;
+  scriptId?: string;
   prompt: string;
   imagePath?: string;
   status: 'pending' | 'generating' | 'done';
+  createdAt?: string;
 }
 
 export interface AudioAsset {
   id: string;
   profileId: string;
-  scriptId: string;
+  scriptId?: string;
+  prompt?: string;
+  text?: string;
   language: 'hindi' | 'english';
   characterName: string;
   audioPath?: string;
   status: 'pending' | 'generating' | 'done';
+  createdAt?: string;
 }
 
 export interface GenerationItem {

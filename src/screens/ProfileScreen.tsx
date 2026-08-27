@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Alert,
   ScrollView,
@@ -11,6 +10,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useProfile} from '../context/ProfileContext';
 import {useTheme, ThemeMode} from '../context/ThemeContext';
+import {useApiConfig} from '../context/ApiConfigContext';
 import {Profile} from '../types';
 import {Typography} from '../theme/typography';
 import {BorderRadius, Spacing} from '../theme/spacing';
@@ -48,8 +48,10 @@ export default function ProfileScreen({navigation}: Props) {
     deleteProfile,
   } = useProfile();
 
-  const {themeMode, setThemeMode, isDark, colors, systemColorScheme} = useTheme();
+  const {themeMode, setThemeMode, colors, systemColorScheme} = useTheme();
+  const {hasApiKey, model} = useApiConfig();
 
+  // Profile modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [newProfileName, setNewProfileName] = useState('');
@@ -127,21 +129,18 @@ export default function ProfileScreen({navigation}: Props) {
     label: string;
     description: string;
     icon: string;
-    iconBg: string;
   }[] = [
     {
       mode: 'light',
       label: 'Light Mode (White)',
       description: 'Bright and clean appearance',
       icon: 'light-mode',
-      iconBg: '#FEF3C7',
     },
     {
       mode: 'dark',
       label: 'Dark Mode',
       description: 'Sleek dark theme, easy on the eyes',
       icon: 'dark-mode',
-      iconBg: '#3730A3',
     },
     {
       mode: 'system',
@@ -150,7 +149,6 @@ export default function ProfileScreen({navigation}: Props) {
         systemColorScheme === 'dark' ? 'Dark' : 'Light'
       })`,
       icon: 'settings-suggest',
-      iconBg: '#D1FAE5',
     },
   ];
 
@@ -254,6 +252,58 @@ export default function ProfileScreen({navigation}: Props) {
             </View>
           </View>
         ) : null}
+
+        {/* PREREQUISITES NAVIGATION CARD */}
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={[
+              styles.prereqNavCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: hasApiKey ? colors.secondary + '40' : colors.border,
+              },
+            ]}
+            onPress={() => navigation.navigate('Prerequisites')}
+            activeOpacity={0.8}>
+            <View style={styles.prereqNavLeft}>
+              <View
+                style={[
+                  styles.prereqIconBox,
+                  {backgroundColor: colors.primary + '15'},
+                ]}><Icon name="vpn-key" size={24} color={colors.primary} />
+              </View>
+              <View style={styles.prereqNavText}>
+                <View style={styles.prereqTitleRow}>
+                  <Text style={[styles.prereqNavTitle, {color: colors.text}]}>
+                    Prerequisites
+                  </Text>
+                  <View
+                    style={[
+                      styles.statusPill,
+                      {
+                        backgroundColor: hasApiKey
+                          ? colors.secondary + '20'
+                          : colors.warning + '20',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.statusPillText,
+                        {color: hasApiKey ? colors.secondary : colors.warning},
+                      ]}>
+                      {hasApiKey ? 'Configured' : 'Setup Required'}
+                    </Text>
+                  </View>
+                </View>
+                <Text
+                  style={[styles.prereqNavDesc, {color: colors.textSecondary}]}>
+                  OpenCode API Key & AI Model: {model}
+                </Text>
+              </View>
+            </View>
+            <Icon name="chevron-right" size={24} color={colors.textLight} />
+          </TouchableOpacity>
+        </View>
 
         {/* Theme / Appearance Settings Section */}
         <View style={styles.section}>
@@ -379,7 +429,7 @@ export default function ProfileScreen({navigation}: Props) {
             />
           ) : (
             <View style={styles.profileList}>
-              {profiles.map((item, index) => {
+              {profiles.map(item => {
                 const isActive = activeProfile?.id === item.id;
                 const avatarBg = getAvatarColor(item.name);
 
@@ -472,7 +522,7 @@ export default function ProfileScreen({navigation}: Props) {
         </Text>
         <CustomInput
           label="Profile Name"
-          placeholder="e.g. Raj Tech Channel"
+          placeholder="e.g. Tech Channel"
           value={newProfileName}
           onChangeText={setNewProfileName}
           autoFocus
@@ -613,6 +663,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.xs,
+    flexWrap: 'wrap',
   },
   sectionTitle: {
     ...Typography.h3,
@@ -622,6 +673,58 @@ const styles = StyleSheet.create({
   sectionSubtitle: {
     ...Typography.caption,
     marginTop: 2,
+  },
+  prereqNavCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+  },
+  prereqNavLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: Spacing.sm,
+  },
+  prereqIconBox: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: Spacing.md,
+  },
+  prereqNavText: {
+    flex: 1,
+  },
+  prereqTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    marginBottom: 2,
+  },
+  prereqNavTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  statusPill: {
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 8,
+  },
+  statusPillText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  prereqNavDesc: {
+    fontSize: 12,
   },
   addInlineBtn: {
     flexDirection: 'row',

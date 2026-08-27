@@ -9,11 +9,18 @@ import CustomButton from '../common/CustomButton';
 interface ScriptCardProps {
   script: Script;
   onStart: () => void;
-  onReset: () => void;
+  onDelete?: () => void;
+  onReset?: () => void;
 }
 
-export default function ScriptCard({script, onStart, onReset}: ScriptCardProps) {
+export default function ScriptCard({
+  script,
+  onStart,
+  onDelete,
+  onReset,
+}: ScriptCardProps) {
   const {colors} = useTheme();
+  const handleDelete = onDelete || onReset || (() => {});
 
   return (
     <View
@@ -24,37 +31,35 @@ export default function ScriptCard({script, onStart, onReset}: ScriptCardProps) 
           borderColor: colors.border,
         },
       ]}>
-      <View
-        style={[
-          styles.rectanglePlaceholder,
-          {backgroundColor: colors.background},
-        ]}>
-        <Text style={styles.placeholderIcon}>📄</Text>
-      </View>
-      <Text style={[styles.title, {color: colors.text}]} numberOfLines={1}>
-        {script.title}
-      </Text>
-      {script.description ? (
-        <Text
-          style={[styles.description, {color: colors.textSecondary}]}
-          numberOfLines={2}>
-          {script.description}
+      {/* Title at top */}
+      <View style={styles.header}>
+        <Text style={[styles.title, {color: colors.text}]} numberOfLines={2}>
+          {script.title}
         </Text>
-      ) : null}
-      <View style={styles.actions}>
+        {script.description ? (
+          <Text
+            style={[styles.description, {color: colors.textSecondary}]}
+            numberOfLines={2}>
+            {script.description}
+          </Text>
+        ) : null}
+      </View>
+
+      {/* Two buttons in the same row below */}
+      <View style={styles.buttonRow}>
         <CustomButton
-          title="Reset"
-          variant="outline"
+          title="Delete"
+          variant="danger"
           size="sm"
-          onPress={onReset}
-          style={styles.resetBtn}
+          onPress={handleDelete}
+          style={styles.btn}
         />
         <CustomButton
           title="Start"
           variant="primary"
           size="sm"
           onPress={onStart}
-          style={styles.startBtn}
+          style={styles.btn}
         />
       </View>
     </View>
@@ -65,36 +70,34 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: BorderRadius.lg,
     marginHorizontal: Spacing.lg,
-    marginVertical: Spacing.sm,
+    marginVertical: Spacing.xs,
     padding: Spacing.lg,
     borderWidth: 1,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
   },
-  rectanglePlaceholder: {
-    height: 120,
-    borderRadius: BorderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
+  header: {
     marginBottom: Spacing.md,
-  },
-  placeholderIcon: {
-    fontSize: 36,
   },
   title: {
     ...Typography.h3,
-    marginBottom: Spacing.xs,
+    fontSize: 16,
+    fontWeight: '700',
   },
   description: {
     ...Typography.caption,
-    marginBottom: Spacing.md,
+    marginTop: 4,
+    lineHeight: 18,
   },
-  actions: {
+  buttonRow: {
     flexDirection: 'row',
-    gap: Spacing.sm,
+    alignItems: 'center',
+    gap: Spacing.md,
   },
-  resetBtn: {
-    flex: 1,
-  },
-  startBtn: {
+  btn: {
     flex: 1,
   },
 });

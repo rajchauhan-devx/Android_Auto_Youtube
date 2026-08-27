@@ -13,7 +13,7 @@ interface StartScriptModalProps {
   visible: boolean;
   script: Script | null;
   onClose: () => void;
-  onStart: (instructions: string) => void;
+  onStart: (instructions: string, topic?: string) => void;
   onViewDescription: () => void;
 }
 
@@ -25,26 +25,27 @@ export default function StartScriptModal({
   onViewDescription,
 }: StartScriptModalProps) {
   const {colors} = useTheme();
+  const [topic, setTopic] = useState('');
   const [instructions, setInstructions] = useState('');
 
   if (!script) return null;
 
   const handleStart = () => {
-    onStart(instructions.trim());
+    onStart(instructions.trim(), topic.trim());
+    setTopic('');
     setInstructions('');
     onClose();
   };
 
   return (
     <AppModal visible={visible} onClose={onClose}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
         <Text style={[styles.title, {color: colors.text}]}>{script.title}</Text>
 
         <TouchableOpacity
-          style={[
-            styles.viewFileBtn,
-            {backgroundColor: colors.background},
-          ]}
+          style={[styles.viewFileBtn, {backgroundColor: colors.background}]}
           onPress={onViewDescription}
           activeOpacity={0.7}>
           <Icon name="description" size={20} color={colors.primary} />
@@ -54,9 +55,18 @@ export default function StartScriptModal({
           <Icon name="chevron-right" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
 
+        {/* Topic Input */}
+        <CustomInput
+          label="Topic"
+          placeholder="e.g. Space Exploration, Anime, Tech..."
+          value={topic}
+          onChangeText={setTopic}
+        />
+
+        {/* Instructions for AI Input */}
         <CustomInput
           label="Instructions for AI"
-          placeholder="Enter instructions for the AI..."
+          placeholder="Enter custom instructions for the AI..."
           value={instructions}
           onChangeText={setInstructions}
           multiline
@@ -73,23 +83,25 @@ export default function StartScriptModal({
 const styles = StyleSheet.create({
   title: {
     ...Typography.h2,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
     textAlign: 'center',
+    fontWeight: '700',
   },
   viewFileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 10,
     padding: Spacing.md,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
     gap: Spacing.sm,
   },
   viewFileText: {
     ...Typography.body,
+    fontWeight: '600',
     flex: 1,
   },
   textArea: {
-    height: 100,
+    height: 90,
     textAlignVertical: 'top',
   },
 });

@@ -5,6 +5,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import {ProfileProvider} from './src/context/ProfileContext';
 import {ScriptProvider} from './src/context/ScriptContext';
+import {AssetProvider} from './src/context/AssetContext';
+import {ApiConfigProvider} from './src/context/ApiConfigContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
 function MainApp() {
@@ -14,11 +16,15 @@ function MainApp() {
     <>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
-        <ProfileProvider>
-          <ScriptProvider>
-            <AppNavigator />
-          </ScriptProvider>
-        </ProfileProvider>
+        <ApiConfigProvider>
+          <ProfileProvider>
+            <ScriptProvider>
+              <AssetProvider>
+                <AppNavigator />
+              </AssetProvider>
+            </ScriptProvider>
+          </ProfileProvider>
+        </ApiConfigProvider>
       </NavigationContainer>
     </>
   );

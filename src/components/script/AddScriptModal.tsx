@@ -10,7 +10,12 @@ import CustomButton from '../common/CustomButton';
 interface AddScriptModalProps {
   visible: boolean;
   onClose: () => void;
-  onAdd: (title: string, description: string, fileName?: string, fileContent?: string) => void;
+  onAdd: (
+    title: string,
+    description: string,
+    fileName?: string,
+    fileContent?: string,
+  ) => Promise<any> | void;
 }
 
 export default function AddScriptModal({
@@ -21,28 +26,40 @@ export default function AddScriptModal({
   const {colors} = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [saving, setSaving] = useState(false);
 
-  const handleAdd = () => {
-    if (!title.trim()) return;
-    onAdd(title.trim(), description.trim());
-    setTitle('');
-    setDescription('');
-    onClose();
+  const handleAdd = async () => {
+    if (!title.trim() || saving) return;
+    setSaving(true);
+    try {
+      await onAdd(title.trim(), description.trim());
+      setTitle('');
+      setDescription('');
+      onClose();
+    } catch (err) {
+      console.warn('Error saving script:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <AppModal visible={visible} onClose={onClose}>
+    <AppModal
+      visible={visible}
+      onClose={() => {
+        if (!saving) onClose();
+      }}>
       <Text style={[styles.modalTitle, {color: colors.text}]}>Add Script</Text>
       <CustomInput
         label="Script Title"
-        placeholder="Enter script title"
+        placeholder="Enter script title (e.g. Episode 1)"
         value={title}
         onChangeText={setTitle}
         autoFocus
       />
       <CustomInput
         label="Description / File Content"
-        placeholder="Enter description or paste file content (.md, .txt)"
+        placeholder="Enter description or paste script content (.txt, .md)"
         value={description}
         onChangeText={setDescription}
         multiline
@@ -50,9 +67,10 @@ export default function AddScriptModal({
         style={styles.textArea}
       />
       <CustomButton
-        title="Add Script"
+        title={saving ? 'Saving to Phone Storage...' : 'Save Script'}
         onPress={handleAdd}
-        disabled={!title.trim()}
+        disabled={!title.trim() || saving}
+        loading={saving}
       />
     </AppModal>
   );
@@ -63,6 +81,7 @@ const styles = StyleSheet.create({
     ...Typography.h2,
     marginBottom: Spacing.xl,
     textAlign: 'center',
+    fontWeight: '700',
   },
   textArea: {
     height: 120,

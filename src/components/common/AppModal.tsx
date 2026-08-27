@@ -4,9 +4,10 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   KeyboardAvoidingView,
   Platform,
+  ViewStyle,
+  StyleProp,
 } from 'react-native';
 import {useTheme} from '../../context/ThemeContext';
 import {BorderRadius, Spacing} from '../../theme/spacing';
@@ -17,6 +18,7 @@ interface AppModalProps {
   onClose: () => void;
   children: React.ReactNode;
   showClose?: boolean;
+  contentStyle?: StyleProp<ViewStyle>;
 }
 
 export default function AppModal({
@@ -24,6 +26,7 @@ export default function AppModal({
   onClose,
   children,
   showClose = true,
+  contentStyle,
 }: AppModalProps) {
   const {colors} = useTheme();
 
@@ -33,30 +36,37 @@ export default function AppModal({
       transparent
       animationType="fade"
       onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={[styles.overlay, {backgroundColor: colors.overlay}]}>
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <View
-              style={[
-                styles.modalContent,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderWidth: 1,
-                },
-              ]}>
-              {showClose && (
-                <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                  <Icon name="close" size={22} color={colors.textSecondary} />
-                </TouchableOpacity>
-              )}
-              {children}
-            </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.overlay}>
+        {/* Backdrop (tap outside to close) */}
+        <TouchableOpacity
+          style={[styles.backdrop, {backgroundColor: colors.overlay}]}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+
+        {/* Modal Content Box - Touch events pass directly to child ScrollViews */}
+        <View
+          style={[
+            styles.modalContent,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+            contentStyle,
+          ]}>
+          {showClose && (
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={onClose}
+              hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}>
+              <Icon name="close" size={22} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
+          {children}
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -66,20 +76,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Spacing.xl,
+    padding: Spacing.md,
+  },
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   modalContent: {
     borderRadius: BorderRadius.lg,
-    padding: Spacing.xxl,
-    width: '100%',
-    maxWidth: 420,
-    maxHeight: '80%',
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
+    width: '96%',
+    maxWidth: 480,
+    maxHeight: '90%',
+    borderWidth: 1,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    zIndex: 2,
   },
   closeBtn: {
     position: 'absolute',
-    top: Spacing.md,
-    right: Spacing.md,
+    top: Spacing.sm,
+    right: Spacing.sm,
     padding: Spacing.xs,
-    zIndex: 1,
+    zIndex: 10,
   },
 });
