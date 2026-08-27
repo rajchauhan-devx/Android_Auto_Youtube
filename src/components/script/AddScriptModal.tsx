@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Text, StyleSheet} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {Spacing} from '../../theme/spacing';
 import AppModal from '../common/AppModal';
@@ -18,6 +18,7 @@ export default function AddScriptModal({
   onClose,
   onAdd,
 }: AddScriptModalProps) {
+  const {colors} = useTheme();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
@@ -31,7 +32,7 @@ export default function AddScriptModal({
 
   return (
     <AppModal visible={visible} onClose={onClose}>
-      <Text style={styles.modalTitle}>Add Script</Text>
+      <Text style={[styles.modalTitle, {color: colors.text}]}>Add Script</Text>
       <CustomInput
         label="Script Title"
         placeholder="Enter script title"
@@ -60,7 +61,6 @@ export default function AddScriptModal({
 const styles = StyleSheet.create({
   modalTitle: {
     ...Typography.h2,
-    color: Colors.text,
     marginBottom: Spacing.xl,
     textAlign: 'center',
   },

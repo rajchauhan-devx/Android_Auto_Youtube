@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import {Script} from '../../types';
@@ -13,16 +13,31 @@ interface ScriptCardProps {
 }
 
 export default function ScriptCard({script, onStart, onReset}: ScriptCardProps) {
+  const {colors} = useTheme();
+
   return (
-    <View style={styles.card}>
-      <View style={styles.rectanglePlaceholder}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}>
+      <View
+        style={[
+          styles.rectanglePlaceholder,
+          {backgroundColor: colors.background},
+        ]}>
         <Text style={styles.placeholderIcon}>📄</Text>
       </View>
-      <Text style={styles.title} numberOfLines={1}>
+      <Text style={[styles.title, {color: colors.text}]} numberOfLines={1}>
         {script.title}
       </Text>
       {script.description ? (
-        <Text style={styles.description} numberOfLines={2}>
+        <Text
+          style={[styles.description, {color: colors.textSecondary}]}
+          numberOfLines={2}>
           {script.description}
         </Text>
       ) : null}
@@ -48,17 +63,14 @@ export default function ScriptCard({script, onStart, onReset}: ScriptCardProps) 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     marginHorizontal: Spacing.lg,
     marginVertical: Spacing.sm,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
   rectanglePlaceholder: {
     height: 120,
-    backgroundColor: Colors.background,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -69,12 +81,10 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.h3,
-    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   description: {
     ...Typography.caption,
-    color: Colors.textSecondary,
     marginBottom: Spacing.md,
   },
   actions: {

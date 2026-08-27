@@ -2,14 +2,17 @@ import React from 'react';
 import {StatusBar} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {NavigationContainer} from '@react-navigation/native';
+import {ThemeProvider, useTheme} from './src/context/ThemeContext';
 import {ProfileProvider} from './src/context/ProfileContext';
 import {ScriptProvider} from './src/context/ScriptContext';
 import AppNavigator from './src/navigation/AppNavigator';
 
-export default function App() {
+function MainApp() {
+  const {isDark} = useTheme();
+
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle="dark-content" />
+    <>
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
         <ProfileProvider>
           <ScriptProvider>
@@ -17,6 +20,16 @@ export default function App() {
           </ScriptProvider>
         </ProfileProvider>
       </NavigationContainer>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <MainApp />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

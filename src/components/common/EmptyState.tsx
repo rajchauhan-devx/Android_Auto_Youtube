@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {Spacing} from '../../theme/spacing';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -12,11 +12,17 @@ interface EmptyStateProps {
 }
 
 export default function EmptyState({icon, title, message}: EmptyStateProps) {
+  const {colors} = useTheme();
+
   return (
     <View style={styles.container}>
-      <Icon name={icon} size={56} color={Colors.textLight} />
-      <Text style={styles.title}>{title}</Text>
-      {message && <Text style={styles.message}>{message}</Text>}
+      <Icon name={icon} size={56} color={colors.textLight} />
+      <Text style={[styles.title, {color: colors.textSecondary}]}>{title}</Text>
+      {message && (
+        <Text style={[styles.message, {color: colors.textLight}]}>
+          {message}
+        </Text>
+      )}
     </View>
   );
 }
@@ -31,13 +37,11 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.h3,
-    color: Colors.textSecondary,
     marginTop: Spacing.lg,
     textAlign: 'center',
   },
   message: {
     ...Typography.body,
-    color: Colors.textLight,
     marginTop: Spacing.sm,
     textAlign: 'center',
   },

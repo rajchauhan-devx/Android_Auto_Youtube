@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import {ChatMessage as ChatMessageType} from '../../types';
@@ -10,6 +10,7 @@ interface ChatBubbleProps {
 }
 
 export default function ChatBubble({message}: ChatBubbleProps) {
+  const {colors} = useTheme();
   const isUser = message.role === 'user';
 
   return (
@@ -21,12 +22,22 @@ export default function ChatBubble({message}: ChatBubbleProps) {
       <View
         style={[
           styles.bubble,
-          isUser ? styles.userBubble : styles.assistantBubble,
+          isUser
+            ? [styles.userBubble, {backgroundColor: colors.primary}]
+            : [
+                styles.assistantBubble,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ],
         ]}>
         <Text
           style={[
             styles.text,
-            isUser ? styles.userText : styles.assistantText,
+            isUser
+              ? [styles.userText, {color: colors.white}]
+              : [styles.assistantText, {color: colors.text}],
           ]}>
           {message.content}
         </Text>
@@ -53,23 +64,16 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   userBubble: {
-    backgroundColor: Colors.primary,
     borderBottomRightRadius: Spacing.xs,
   },
   assistantBubble: {
-    backgroundColor: Colors.surface,
     borderBottomLeftRadius: Spacing.xs,
     borderWidth: 1,
-    borderColor: Colors.border,
   },
   text: {
     ...Typography.body,
     lineHeight: 22,
   },
-  userText: {
-    color: Colors.white,
-  },
-  assistantText: {
-    color: Colors.text,
-  },
+  userText: {},
+  assistantText: {},
 });

@@ -1,14 +1,18 @@
 import React, {createContext, useContext, useState, useCallback} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Profile} from '../types';
 import {Storage} from '../utils/storage';
+
+const ACTIVE_PROFILE_KEY = '@active_profile_id';
 
 interface ProfileContextType {
   profiles: Profile[];
   activeProfile: Profile | null;
   loading: boolean;
   loadProfiles: () => Promise<void>;
-  addProfile: (name: string) => Promise<void>;
-  selectProfile: (profile: Profile) => void;
+  addProfile: (name: string) => Promise<Profile>;
+  updateProfile: (id: string, name: string) => Promise<void>;
+  selectProfile: (profile: Profile) => Promise<void>;
   deleteProfile: (id: string) => Promise<void>;
 }
 
@@ -23,7 +27,21 @@ export function ProfileProvider({children}: {children: React.ReactNode}) {
     setLoading(true);
     try {
       const data = await Storage.getProfiles();
-      setProfiles(JSON.parse(data));
+      const parsedProfiles: Profile[] = JSON.parse(data);
+      setProfiles(parsedProfiles);
+
+      // Restore active profile
+      const activeId = await AsyncStorage.getItem(ACTIVE_PROFILE_KEY);
+      if (activeId) {
+        const found = parsedProfiles.find(p => p.id === activeId);
+        if (found) {
+          setActiveProfile(found);
+        } else if (parsedProfiles.length > 0) {
+          setActiveProfile(parsedProfiles[0]);
+        }
+      } else if (parsedProfiles.length > 0) {
+        setActiveProfile(parsedProfiles[0]);
+      }
     } catch {
       setProfiles([]);
     }
@@ -31,7 +49,7 @@ export function ProfileProvider({children}: {children: React.ReactNode}) {
   }, []);
 
   const addProfile = useCallback(
-    async (name: string) => {
+    async (name: string): Promise<Profile> => {
       const newProfile: Profile = {
         id: Date.now().toString(),
         name,
@@ -40,12 +58,30 @@ export function ProfileProvider({children}: {children: React.ReactNode}) {
       const updated = [...profiles, newProfile];
       setProfiles(updated);
       await Storage.setProfiles(JSON.stringify(updated));
+      return newProfile;
     },
     [profiles],
   );
 
-  const selectProfile = useCallback((profile: Profile) => {
+  const updateProfile = useCallback(
+    async (id: string, name: string) => {
+      const updated = profiles.map(p => (p.id === id ? {...p, name} : p));
+      setProfiles(updated);
+      await Storage.setProfiles(JSON.stringify(updated));
+      if (activeProfile?.id === id) {
+        setActiveProfile(prev => (prev ? {...prev, name} : null));
+      }
+    },
+    [profiles, activeProfile],
+  );
+
+  const selectProfile = useCallback(async (profile: Profile) => {
     setActiveProfile(profile);
+    try {
+      await AsyncStorage.setItem(ACTIVE_PROFILE_KEY, profile.id);
+    } catch {
+      // Ignore
+    }
   }, []);
 
   const deleteProfile = useCallback(
@@ -55,7 +91,13 @@ export function ProfileProvider({children}: {children: React.ReactNode}) {
       setProfiles(updated);
       await Storage.setProfiles(JSON.stringify(updated));
       if (activeProfile?.id === id) {
-        setActiveProfile(null);
+        const nextProfile = updated.length > 0 ? updated[0] : null;
+        setActiveProfile(nextProfile);
+        if (nextProfile) {
+          await AsyncStorage.setItem(ACTIVE_PROFILE_KEY, nextProfile.id);
+        } else {
+          await AsyncStorage.removeItem(ACTIVE_PROFILE_KEY);
+        }
       }
     },
     [profiles, activeProfile],
@@ -69,6 +111,7 @@ export function ProfileProvider({children}: {children: React.ReactNode}) {
         loading,
         loadProfiles,
         addProfile,
+        updateProfile,
         selectProfile,
         deleteProfile,
       }}>

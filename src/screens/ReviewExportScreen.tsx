@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, FlatList} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {Colors} from '../theme/colors';
+import {useTheme} from '../context/ThemeContext';
 import {Spacing} from '../theme/spacing';
 import Header from '../components/common/Header';
 import ReviewCard from '../components/review/ReviewCard';
@@ -16,6 +16,7 @@ interface ReviewItem {
 }
 
 export default function ReviewExportScreen({navigation}: {navigation: any}) {
+  const {colors} = useTheme();
   const [items, setItems] = useState<ReviewItem[]>([]);
 
   const handleDurationChange = (id: string, value: number) => {
@@ -29,7 +30,9 @@ export default function ReviewExportScreen({navigation}: {navigation: any}) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, {backgroundColor: colors.background}]}
+      edges={['top']}>
       <Header title="Review & Export" />
       <FlatList
         data={items}
@@ -51,7 +54,14 @@ export default function ReviewExportScreen({navigation}: {navigation: any}) {
           />
         }
       />
-      <View style={styles.footer}>
+      <View
+        style={[
+          styles.footer,
+          {
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
+          },
+        ]}>
         <CustomButton
           title="Export"
           onPress={handleExport}
@@ -65,7 +75,6 @@ export default function ReviewExportScreen({navigation}: {navigation: any}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   list: {
     paddingVertical: Spacing.md,
@@ -73,8 +82,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: Spacing.lg,
-    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
   },
 });

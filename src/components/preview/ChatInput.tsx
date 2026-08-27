@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, TextInput, StyleSheet, TouchableOpacity} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -9,6 +9,7 @@ interface ChatInputProps {
 }
 
 export default function ChatInput({onSend}: ChatInputProps) {
+  const {colors} = useTheme();
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
@@ -18,25 +19,46 @@ export default function ChatInput({onSend}: ChatInputProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+        },
+      ]}>
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.border,
+            color: colors.text,
+          },
+        ]}
         placeholder="Type a message..."
-        placeholderTextColor={Colors.placeholder}
+        placeholderTextColor={colors.placeholder}
         value={message}
         onChangeText={setMessage}
         multiline
         maxLength={2000}
       />
       <TouchableOpacity
-        style={[styles.sendBtn, !message.trim() && styles.sendBtnDisabled]}
+        style={[
+          styles.sendBtn,
+          {
+            backgroundColor: message.trim()
+              ? colors.primary
+              : colors.border,
+          },
+        ]}
         onPress={handleSend}
         disabled={!message.trim()}
         activeOpacity={0.7}>
         <Icon
           name="send"
           size={20}
-          color={message.trim() ? Colors.white : Colors.textLight}
+          color={message.trim() ? colors.white : colors.textLight}
         />
       </TouchableOpacity>
     </View>
@@ -49,32 +71,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.md,
-    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
     gap: Spacing.sm,
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: BorderRadius.xl,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     fontSize: 16,
-    color: Colors.text,
     maxHeight: 100,
-    backgroundColor: Colors.background,
   },
   sendBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  sendBtnDisabled: {
-    backgroundColor: Colors.borderLight,
   },
 });

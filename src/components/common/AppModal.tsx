@@ -8,7 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -25,6 +25,8 @@ export default function AppModal({
   children,
   showClose = true,
 }: AppModalProps) {
+  const {colors} = useTheme();
+
   return (
     <Modal
       visible={visible}
@@ -34,12 +36,20 @@ export default function AppModal({
       <TouchableWithoutFeedback onPress={onClose}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.overlay}>
+          style={[styles.overlay, {backgroundColor: colors.overlay}]}>
           <TouchableWithoutFeedback onPress={() => {}}>
-            <View style={styles.modalContent}>
+            <View
+              style={[
+                styles.modalContent,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  borderWidth: 1,
+                },
+              ]}>
               {showClose && (
                 <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-                  <Icon name="close" size={22} color={Colors.textSecondary} />
+                  <Icon name="close" size={22} color={colors.textSecondary} />
                 </TouchableOpacity>
               )}
               {children}
@@ -54,13 +64,11 @@ export default function AppModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: Colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: Spacing.xl,
   },
   modalContent: {
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.lg,
     padding: Spacing.xxl,
     width: '100%',

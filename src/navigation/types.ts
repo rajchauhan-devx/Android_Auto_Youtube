@@ -12,6 +12,7 @@ export type MainTabParamList = {
   Generation: undefined;
   Review: undefined;
   YouTube: undefined;
+  Profile: undefined;
 };
 
 export type RootStackNavigationProp = NativeStackNavigationProp<RootStackParamList>;

@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useScripts} from '../context/ScriptContext';
+import {useTheme} from '../context/ThemeContext';
 import {Script} from '../types';
-import {Colors} from '../theme/colors';
 import {Typography} from '../theme/typography';
 import {Spacing} from '../theme/spacing';
 import ScriptCard from '../components/script/ScriptCard';
@@ -20,6 +20,7 @@ interface Props {
 
 export default function ScriptScreen({navigation}: Props) {
   const {scripts, loading, loadScripts, addScript, deleteScript} = useScripts();
+  const {colors} = useTheme();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
@@ -46,11 +47,12 @@ export default function ScriptScreen({navigation}: Props) {
 
   const handleEditDescription = () => {
     setShowDescriptionModal(false);
-    // Edit modal logic here
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, {backgroundColor: colors.background}]}
+      edges={['top']}>
       <Header
         title="Scripts"
         rightAction={{icon: 'add', onPress: () => setShowAddModal(true)}}
@@ -94,15 +96,19 @@ export default function ScriptScreen({navigation}: Props) {
       <AppModal
         visible={showDescriptionModal}
         onClose={() => setShowDescriptionModal(false)}>
-        <Text style={styles.descTitle}>{selectedScript?.title}</Text>
-        <Text style={styles.descContent}>
-          {selectedScript?.fileContent || selectedScript?.description || 'No description available'}
+        <Text style={[styles.descTitle, {color: colors.text}]}>
+          {selectedScript?.title}
+        </Text>
+        <Text style={[styles.descContent, {color: colors.textSecondary}]}>
+          {selectedScript?.fileContent ||
+            selectedScript?.description ||
+            'No description available'}
         </Text>
         <TouchableOpacity
           style={styles.editBtn}
           onPress={handleEditDescription}>
-          <Icon name="edit" size={18} color={Colors.primary} />
-          <Text style={styles.editBtnText}>Edit</Text>
+          <Icon name="edit" size={18} color={colors.primary} />
+          <Text style={[styles.editBtnText, {color: colors.primary}]}>Edit</Text>
         </TouchableOpacity>
       </AppModal>
     </SafeAreaView>
@@ -112,7 +118,6 @@ export default function ScriptScreen({navigation}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   list: {
     paddingVertical: Spacing.md,
@@ -120,12 +125,10 @@ const styles = StyleSheet.create({
   },
   descTitle: {
     ...Typography.h3,
-    color: Colors.text,
     marginBottom: Spacing.lg,
   },
   descContent: {
     ...Typography.body,
-    color: Colors.textSecondary,
     lineHeight: 24,
     marginBottom: Spacing.xl,
   },
@@ -138,6 +141,5 @@ const styles = StyleSheet.create({
   },
   editBtnText: {
     ...Typography.buttonSmall,
-    color: Colors.primary,
   },
 });

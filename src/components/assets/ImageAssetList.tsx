@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import {ImageAsset} from '../../types';
@@ -12,6 +12,8 @@ interface ImageAssetListProps {
 }
 
 export default function ImageAssetList({assets}: ImageAssetListProps) {
+  const {colors} = useTheme();
+
   if (assets.length === 0) {
     return (
       <EmptyState
@@ -28,16 +30,43 @@ export default function ImageAssetList({assets}: ImageAssetListProps) {
       keyExtractor={item => item.id}
       contentContainerStyle={styles.list}
       renderItem={({item, index}) => (
-        <View style={styles.card}>
-          <View style={styles.thumbnail}>
-            <Icon name="image" size={24} color={Colors.textLight} />
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}>
+          <View
+            style={[
+              styles.thumbnail,
+              {backgroundColor: colors.background},
+            ]}>
+            <Icon name="image" size={24} color={colors.textLight} />
           </View>
           <View style={styles.info}>
-            <Text style={styles.promptNumber}>Prompt {index + 1}</Text>
-            <Text style={styles.prompt} numberOfLines={2}>
+            <Text style={[styles.promptNumber, {color: colors.text}]}>
+              Prompt {index + 1}
+            </Text>
+            <Text
+              style={[styles.prompt, {color: colors.textSecondary}]}
+              numberOfLines={2}>
               {item.prompt}
             </Text>
-            <View style={[styles.statusDot, {backgroundColor: item.status === 'done' ? Colors.secondary : item.status === 'generating' ? Colors.warning : Colors.textLight}]} />
+            <View
+              style={[
+                styles.statusDot,
+                {
+                  backgroundColor:
+                    item.status === 'done'
+                      ? colors.secondary
+                      : item.status === 'generating'
+                      ? colors.warning
+                      : colors.textLight,
+                },
+              ]}
+            />
           </View>
         </View>
       )}
@@ -51,19 +80,16 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: Colors.border,
     alignItems: 'center',
   },
   thumbnail: {
     width: 56,
     height: 56,
     borderRadius: BorderRadius.sm,
-    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.md,
@@ -73,12 +99,10 @@ const styles = StyleSheet.create({
   },
   promptNumber: {
     ...Typography.captionBold,
-    color: Colors.text,
     marginBottom: Spacing.xs,
   },
   prompt: {
     ...Typography.caption,
-    color: Colors.textSecondary,
     lineHeight: 18,
   },
   statusDot: {

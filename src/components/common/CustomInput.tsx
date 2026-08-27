@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TextInputProps,
 } from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 
@@ -21,15 +21,29 @@ export default function CustomInput({
   style,
   ...props
 }: CustomInputProps) {
+  const {colors} = useTheme();
+
   return (
     <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && (
+        <Text style={[styles.label, {color: colors.text}]}>{label}</Text>
+      )}
       <TextInput
-        style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor={Colors.placeholder}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.surface,
+            borderColor: error ? colors.danger : colors.border,
+            color: colors.text,
+          },
+          style,
+        ]}
+        placeholderTextColor={colors.placeholder}
         {...props}
       />
-      {error && <Text style={styles.error}>{error}</Text>}
+      {error && (
+        <Text style={[styles.error, {color: colors.danger}]}>{error}</Text>
+      )}
     </View>
   );
 }
@@ -40,25 +54,17 @@ const styles = StyleSheet.create({
   },
   label: {
     ...Typography.captionBold,
-    color: Colors.text,
     marginBottom: Spacing.sm,
   },
   input: {
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: BorderRadius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
     fontSize: 16,
-    color: Colors.text,
-    backgroundColor: Colors.surface,
-  },
-  inputError: {
-    borderColor: Colors.danger,
   },
   error: {
     ...Typography.small,
-    color: Colors.danger,
     marginTop: Spacing.xs,
   },
 });

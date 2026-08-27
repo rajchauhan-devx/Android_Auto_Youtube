@@ -3,24 +3,26 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from './types';
 import ProfileScreen from '../screens/ProfileScreen';
 import MainTabs from './MainTabs';
-import {Colors} from '../theme/colors';
+import {useTheme} from '../context/ThemeContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
+  const {colors} = useTheme();
+
   return (
     <Stack.Navigator
-      initialRouteName="Profile"
+      initialRouteName="MainTabs"
       screenOptions={{
         headerShown: false,
-        contentStyle: {backgroundColor: Colors.background},
+        contentStyle: {backgroundColor: colors.background},
       }}>
-      <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen
         name="MainTabs"
         component={MainTabs}
         options={{animation: 'slide_from_right'}}
       />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 }

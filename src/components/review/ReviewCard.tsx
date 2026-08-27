@@ -1,6 +1,6 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -18,35 +18,66 @@ export default function ReviewCard({
   duration,
   onDurationChange,
 }: ReviewCardProps) {
+  const {colors} = useTheme();
+
   return (
-    <View style={styles.card}>
-      <View style={styles.thumbnail}>
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}>
+      <View
+        style={[
+          styles.thumbnail,
+          {backgroundColor: colors.background},
+        ]}>
         <Icon
           name={type === 'image' ? 'image' : 'audiotrack'}
           size={28}
-          color={Colors.textLight}
+          color={colors.textLight}
         />
       </View>
       <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, {color: colors.text}]} numberOfLines={1}>
           {title}
         </Text>
-        <Text style={styles.type}>{type === 'image' ? 'Image' : 'Audio'}</Text>
+        <Text style={[styles.type, {color: colors.textSecondary}]}>
+          {type === 'image' ? 'Image' : 'Audio'}
+        </Text>
       </View>
       <View style={styles.durationControl}>
-        <Text style={styles.durationLabel}>Duration</Text>
+        <Text style={[styles.durationLabel, {color: colors.textSecondary}]}>
+          Duration
+        </Text>
         <View style={styles.durationRow}>
-          <View
-            style={styles.durationBtn}
-            onTouchEnd={() => onDurationChange(Math.max(0.5, duration - 0.5))}>
-            <Icon name="remove" size={16} color={Colors.text} />
-          </View>
-          <Text style={styles.durationValue}>{duration.toFixed(1)}s</Text>
-          <View
-            style={styles.durationBtn}
-            onTouchEnd={() => onDurationChange(duration + 0.5)}>
-            <Icon name="add" size={16} color={Colors.text} />
-          </View>
+          <TouchableOpacity
+            style={[
+              styles.durationBtn,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() => onDurationChange(Math.max(0.5, duration - 0.5))}>
+            <Icon name="remove" size={16} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={[styles.durationValue, {color: colors.text}]}>
+            {duration.toFixed(1)}s
+          </Text>
+          <TouchableOpacity
+            style={[
+              styles.durationBtn,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() => onDurationChange(duration + 0.5)}>
+            <Icon name="add" size={16} color={colors.text} />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -56,20 +87,17 @@ export default function ReviewCard({
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginHorizontal: Spacing.lg,
     marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: Colors.border,
     alignItems: 'center',
   },
   thumbnail: {
     width: 56,
     height: 56,
     borderRadius: BorderRadius.sm,
-    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Spacing.md,
@@ -79,11 +107,9 @@ const styles = StyleSheet.create({
   },
   title: {
     ...Typography.bodyBold,
-    color: Colors.text,
   },
   type: {
     ...Typography.caption,
-    color: Colors.textSecondary,
     marginTop: Spacing.xs,
   },
   durationControl: {
@@ -91,7 +117,6 @@ const styles = StyleSheet.create({
   },
   durationLabel: {
     ...Typography.small,
-    color: Colors.textSecondary,
     marginBottom: Spacing.xs,
   },
   durationRow: {
@@ -103,15 +128,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: Colors.border,
   },
   durationValue: {
     ...Typography.captionBold,
-    color: Colors.text,
     minWidth: 36,
     textAlign: 'center',
   },

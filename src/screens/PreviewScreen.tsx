@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {FlatList, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {ChatMessage as ChatMessageType} from '../types';
-import {Colors} from '../theme/colors';
+import {useTheme} from '../context/ThemeContext';
 import {Typography} from '../theme/typography';
 import {Spacing} from '../theme/spacing';
 import ChatBubble from '../components/preview/ChatBubble';
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export default function PreviewScreen(_props: Props) {
+  const {colors} = useTheme();
   const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       id: '1',
@@ -45,7 +46,9 @@ export default function PreviewScreen(_props: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView
+      style={[styles.container, {backgroundColor: colors.background}]}
+      edges={['top']}>
       <Header
         title="Preview"
         rightAction={{
@@ -53,9 +56,19 @@ export default function PreviewScreen(_props: Props) {
           onPress: () => {},
         }}
       />
-      <TouchableOpacity style={styles.extractBtn} activeOpacity={0.7}>
-        <Icon name="assets" size={18} color={Colors.primary} />
-        <Text style={styles.extractBtnText}>Extract Assets</Text>
+      <TouchableOpacity
+        style={[
+          styles.extractBtn,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.primary,
+          },
+        ]}
+        activeOpacity={0.7}>
+        <Icon name="perm-media" size={18} color={colors.primary} />
+        <Text style={[styles.extractBtnText, {color: colors.primary}]}>
+          Extract Assets
+        </Text>
       </TouchableOpacity>
       <FlatList
         data={messages}
@@ -72,7 +85,6 @@ export default function PreviewScreen(_props: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   extractBtn: {
     flexDirection: 'row',
@@ -82,15 +94,12 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.primary,
     gap: Spacing.xs,
   },
   extractBtnText: {
     ...Typography.captionBold,
-    color: Colors.primary,
   },
   messageList: {
     paddingVertical: Spacing.md,

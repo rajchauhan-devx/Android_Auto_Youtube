@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Text, StyleSheet, ScrollView, TouchableOpacity} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {Spacing} from '../../theme/spacing';
 import {Script} from '../../types';
@@ -24,6 +24,7 @@ export default function StartScriptModal({
   onStart,
   onViewDescription,
 }: StartScriptModalProps) {
+  const {colors} = useTheme();
   const [instructions, setInstructions] = useState('');
 
   if (!script) return null;
@@ -37,15 +38,20 @@ export default function StartScriptModal({
   return (
     <AppModal visible={visible} onClose={onClose}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>{script.title}</Text>
+        <Text style={[styles.title, {color: colors.text}]}>{script.title}</Text>
 
         <TouchableOpacity
-          style={styles.viewFileBtn}
+          style={[
+            styles.viewFileBtn,
+            {backgroundColor: colors.background},
+          ]}
           onPress={onViewDescription}
           activeOpacity={0.7}>
-          <Icon name="description" size={20} color={Colors.primary} />
-          <Text style={styles.viewFileText}>View Description / File</Text>
-          <Icon name="chevron-right" size={20} color={Colors.textSecondary} />
+          <Icon name="description" size={20} color={colors.primary} />
+          <Text style={[styles.viewFileText, {color: colors.primary}]}>
+            View Description / File
+          </Text>
+          <Icon name="chevron-right" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
 
         <CustomInput
@@ -67,14 +73,12 @@ export default function StartScriptModal({
 const styles = StyleSheet.create({
   title: {
     ...Typography.h2,
-    color: Colors.text,
     marginBottom: Spacing.xl,
     textAlign: 'center',
   },
   viewFileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.background,
     borderRadius: 10,
     padding: Spacing.md,
     marginBottom: Spacing.xl,
@@ -82,7 +86,6 @@ const styles = StyleSheet.create({
   },
   viewFileText: {
     ...Typography.body,
-    color: Colors.primary,
     flex: 1,
   },
   textArea: {

@@ -8,7 +8,8 @@ import AssetsScreen from '../screens/AssetsScreen';
 import GenerationScreen from '../screens/GenerationScreen';
 import ReviewExportScreen from '../screens/ReviewExportScreen';
 import YouTubeScreen from '../screens/YouTubeScreen';
-import {Colors} from '../theme/colors';
+import ProfileScreen from '../screens/ProfileScreen';
+import {useTheme} from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -16,10 +17,11 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 const TAB_ICONS: Record<string, string> = {
   Scripts: 'description',
   Preview: 'chat',
-  Assets: 'assets',
+  Assets: 'perm-media',
   Generation: 'auto-fix-high',
   Review: 'rate-review',
   YouTube: 'smart-display',
+  Profile: 'person',
 };
 
 const TAB_LABELS: Record<string, string> = {
@@ -29,9 +31,12 @@ const TAB_LABELS: Record<string, string> = {
   Generation: 'Generate',
   Review: 'Review',
   YouTube: 'YouTube',
+  Profile: 'Profile',
 };
 
 export default function MainTabs() {
+  const {colors} = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => ({
@@ -42,7 +47,7 @@ export default function MainTabs() {
             <Icon
               name={iconName}
               size={22}
-              color={focused ? Colors.primary : Colors.textLight}
+              color={focused ? colors.primary : colors.textLight}
             />
           );
         },
@@ -50,14 +55,21 @@ export default function MainTabs() {
           <Text
             style={[
               styles.tabLabel,
-              focused ? styles.tabLabelActive : styles.tabLabelInactive,
-            ]}>
+              {color: focused ? colors.primary : colors.textLight},
+            ]}
+            numberOfLines={1}>
             {TAB_LABELS[route.name] || route.name}
           </Text>
         ),
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textLight,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            backgroundColor: colors.surface,
+            borderTopColor: colors.border,
+          },
+        ],
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textLight,
       })}>
       <Tab.Screen name="Scripts" component={ScriptScreen} />
       <Tab.Screen name="Preview" component={PreviewScreen} />
@@ -65,15 +77,14 @@ export default function MainTabs() {
       <Tab.Screen name="Generation" component={GenerationScreen} />
       <Tab.Screen name="Review" component={ReviewExportScreen} />
       <Tab.Screen name="YouTube" component={YouTubeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: Colors.borderLight,
     paddingTop: 4,
     paddingBottom: 4,
     height: 60,
@@ -81,11 +92,5 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     fontWeight: '500',
-  },
-  tabLabelActive: {
-    color: Colors.primary,
-  },
-  tabLabelInactive: {
-    color: Colors.textLight,
   },
 });

@@ -1,22 +1,38 @@
 import React from 'react';
 import {View, Text, StyleSheet, ScrollView} from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 import CustomButton from '../common/CustomButton';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default function ImageGenerationTab() {
+  const {colors} = useTheme();
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <CustomButton title="Start Model" onPress={() => {}} style={styles.startBtn} />
       <View style={styles.grid}>
         {Array.from({length: 6}).map((_, index) => (
-          <View key={index} style={styles.imageCard}>
-            <View style={styles.imagePlaceholder}>
-              <Icon name="image" size={32} color={Colors.textLight} />
+          <View
+            key={index}
+            style={[
+              styles.imageCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}>
+            <View
+              style={[
+                styles.imagePlaceholder,
+                {backgroundColor: colors.background},
+              ]}>
+              <Icon name="image" size={32} color={colors.textLight} />
             </View>
-            <Text style={styles.imageLabel}>Image {index + 1}</Text>
+            <Text style={[styles.imageLabel, {color: colors.textSecondary}]}>
+              Image {index + 1}
+            </Text>
           </View>
         ))}
       </View>
@@ -41,22 +57,18 @@ const styles = StyleSheet.create({
   },
   imageCard: {
     width: '48%',
-    backgroundColor: Colors.surface,
     borderRadius: BorderRadius.md,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: Colors.border,
     marginBottom: Spacing.sm,
   },
   imagePlaceholder: {
     height: 200,
-    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   imageLabel: {
     ...Typography.caption,
-    color: Colors.textSecondary,
     padding: Spacing.sm,
     textAlign: 'center',
   },

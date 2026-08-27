@@ -6,7 +6,7 @@ import {
   ActivityIndicator,
   ViewStyle,
 } from 'react-native';
-import {Colors} from '../../theme/colors';
+import {useTheme} from '../../context/ThemeContext';
 import {Typography} from '../../theme/typography';
 import {BorderRadius, Spacing} from '../../theme/spacing';
 
@@ -29,9 +29,38 @@ export default function CustomButton({
   disabled = false,
   style,
 }: CustomButtonProps) {
+  const {colors} = useTheme();
+
+  const getVariantStyle = () => {
+    switch (variant) {
+      case 'secondary':
+        return {backgroundColor: colors.secondary};
+      case 'outline':
+        return {
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          borderColor: colors.primary,
+        };
+      case 'danger':
+        return {backgroundColor: colors.danger};
+      case 'primary':
+      default:
+        return {backgroundColor: colors.primary};
+    }
+  };
+
+  const getTextStyle = () => {
+    switch (variant) {
+      case 'outline':
+        return {color: colors.primary};
+      default:
+        return {color: '#FFFFFF'};
+    }
+  };
+
   const buttonStyles = [
     styles.base,
-    styles[variant],
+    getVariantStyle(),
     styles[`size_${size}`],
     disabled && styles.disabled,
     style,
@@ -39,7 +68,7 @@ export default function CustomButton({
 
   const textStyles = [
     styles.text,
-    styles[`text_${variant}`],
+    getTextStyle(),
     styles[`textSize_${size}`],
   ];
 
@@ -51,7 +80,7 @@ export default function CustomButton({
       activeOpacity={0.7}>
       {loading ? (
         <ActivityIndicator
-          color={variant === 'outline' ? Colors.primary : Colors.white}
+          color={variant === 'outline' ? colors.primary : '#FFFFFF'}
           size="small"
         />
       ) : (
@@ -67,23 +96,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-  },
-  primary: {
-    backgroundColor: Colors.primary,
-  },
-  secondary: {
-    backgroundColor: Colors.secondary,
-  },
-  outline: {
-    backgroundColor: Colors.transparent,
-    borderWidth: 1.5,
-    borderColor: Colors.primary,
-  },
-  danger: {
-    backgroundColor: Colors.danger,
-  },
-  transparent: {
-    backgroundColor: Colors.transparent,
   },
   size_sm: {
     paddingVertical: Spacing.sm,
@@ -102,19 +114,6 @@ const styles = StyleSheet.create({
   },
   text: {
     ...Typography.button,
-    color: Colors.white,
-  },
-  text_primary: {
-    color: Colors.white,
-  },
-  text_secondary: {
-    color: Colors.white,
-  },
-  text_outline: {
-    color: Colors.primary,
-  },
-  text_danger: {
-    color: Colors.white,
   },
   textSize_sm: {
     ...Typography.buttonSmall,
